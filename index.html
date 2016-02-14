@@ -1,10 +1,14 @@
-<!DOCTYPE HTML>
+<!DOCTYPE html>
 <meta charset="utf-8">
 <link rel="stylesheet" href="css/styles.css">
 <link rel="stylesheet" href="css/chosen.min.css">
 <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
 <link rel="stylesheet" href="css/ui.slider.extras.css">
 <link rel="stylesheet" href="css/jquery-ui-1.7.1.custom.css">
+<link rel="stylesheet" href="css/tipsy.css">
+<head>
+	<title>World Unemployment</title>
+</head>
 <body>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
 	<script src="scripts/chosen.jquery.min.js"></script>
@@ -13,16 +17,18 @@
 	<script src="scripts/underscore-min.js"></script>
   	<script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
   	<script src="scripts/selectToUISlider.jQuery.js"></script>
-
-	<div id = "filters" style="width:1200px; margin:50 auto; height:50px" align="center" class="filter">
+  	<script src="scripts/jquery.tipsy.js"></script>
+	<div id = "filters" style="width:1200px; margin:50 auto; height:50px" align="left" class="filter">
 		<select multiple="multiple" class="filter-country" id = "country-list"></select>
 		<select multiple="multiple" class="filter-region" id="region-list"></select>
 		<select multiple="multiple" class="filter-ig" id="ig-list"></select>
 		<br><br>
-		<div id = "slider1" style="width: 300px; " class = "left"></div>
-		<div id = "slider2" style="width: 300px;" class = "right"><div>Population</div></div>
+		<p style="text-align: left;">Year:</p>
+		<div id = "slider1" style="width: 300px; margin:150 auto" class = "right"></div>
+		<br><br>
+		<p style="text-align: left;">Population Range:</p>
+		<div id = "slider2" style="width: 300px;" class = "right"></div>
 	</div>
-	<!-- <div  id="slider" style="width:1000px; margin:30 auto;" align="center"></div> -->
 	<div id = "chart"></div>
 </body>
 </html>

@@ -1,5 +1,7 @@
 dataset = d3.csv("data/Economy_Parameters_clean.csv", function(dataset){
 
+makePlot(dataset);
+
   var year = []
   var country = []
   var region = []
@@ -16,9 +18,6 @@ dataset = d3.csv("data/Economy_Parameters_clean.csv", function(dataset){
   country = _.uniq(country);
   region = _.uniq(region);
   income_group = _.uniq(income_group);
-  console.log(region);
-  console.log(country);
-  console.log(income_group);
 
     var cl = document.getElementById("country-list");
     country.forEach(function(d){
@@ -27,8 +26,27 @@ dataset = d3.csv("data/Economy_Parameters_clean.csv", function(dataset){
       cl.add(option);
     });
     $(".filter-country").chosen({width: "25%", placeholder_text_multiple: "Country"});
+    var filtered_data = []
     $( ".filter-country" ).change(function() {
-      var value = $('#country-list').val();
+      var countries = $('#country-list').val();
+      var filtered_data = [];
+      if(countries == null)
+      {
+        var filtered_data = [];
+        d3.selectAll("svg").remove();
+        makePlot(dataset);
+      }
+      else
+      {
+      for(var i=0; i < countries.length; i++)
+      {
+        console.log(countries[i]);
+        filtered_data = filtered_data.concat(_.filter(dataset,function(d){return d.country == countries[i];}));
+      }
+      console.log(filtered_data);
+      d3.selectAll("svg").remove();
+      makePlot(filtered_data);
+    };
     });
 
     var rl = document.getElementById("region-list");
@@ -43,7 +61,7 @@ dataset = d3.csv("data/Economy_Parameters_clean.csv", function(dataset){
       console.log(value);
     });
 
- var ig = document.getElementById("ig-list");
+  var ig = document.getElementById("ig-list");
     income_group.forEach(function(d){
       var option = document.createElement("option");
       option.text = d;
@@ -122,18 +140,92 @@ $("#slider2" ).slider({
       change: function(event, ui) {}
   });
 
- 
-  
+
+function makePlot(dataset)
+
+{
+
   var margin = {top: 20, right: 20, bottom: 30, left: 50};
-  var w = 960 - margin.left - margin.right;
-  var h = 500 - margin.top - margin.bottom;
+  var w = 800 - margin.left - margin.right;
+  var h = 400 - margin.top - margin.bottom;
+  var padding = 20;
 
-  var svg=d3.selectAll("chart")
-                .append("svg")
-                .attr("width",w)
-                .attr("height",h)
-                .append("g");
+  var tooltip = d3.select('body').append('div')
+            .style('position','absolute')
+            .style('padding','10px 10px')
+            .style('background','#ecf0f1')
+            .style('opacity',0)
 
+
+  var svg = d3.select("#chart").append("svg")
+    .attr("width", w + margin.left + margin.right)
+    .attr("height", h + margin.top + margin.bottom)
+    .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+  var x = d3.scale.linear()
+        .domain([0, 120])
+        .range([padding, w-padding]);
+
+  var y = d3.scale.linear()
+        .domain([0, 50])
+        .range([h-padding, padding]);
+
+  var circles = svg.selectAll("circle")
+   .data(dataset)
+   .enter()
+   .append("circle")
+    .attr("cx", function(d) { return x(d.internet_users);  })
+    .attr("cy", function(d) { return y(d.unemployment);  })
+    .attr("r", 3)
+    .style("stroke", "black")
+     //.style("fill", function(d) { return colLightness(d.vol); })
+    //.style("fill", function(d) { return col(d.type); })
+    .style("fill","#2ecc71")
+    .style("opacity", 0.4);
+
+
+var xAxis = d3.svg.axis()
+    .ticks(5)
+    .scale(x);
+
+svg.append("g")
+    .attr("class", "axis")
+    .attr("transform", "translate(0," + h + ")")
+    .call(xAxis)
+      .append("text")
+      .attr("x", w)
+      .attr("y", -6)
+      .style("text-anchor", "end")
+      .text("Average Internet Users (Per 100 people)");
+
+var yAxis = d3.svg.axis()
+    .scale(y)
+    .orient("left");
+
+svg.append("g")
+   .attr("class", "axis")
+   .call(yAxis)
+      .append("text")
+      .attr("transform", "rotate(-90)")
+      .attr("y", 6)
+      .attr("dy", ".71em")
+      .style("text-anchor", "end")
+      .text("Average Unemployment Rate %");
+
+$('svg circle').tipsy({ 
+        gravity: 's', 
+        html: true, 
+        title: function() {
+          var d = this.__data__;
+        return "Country: " + d.country + "<br>" 
+        + "Year: " + d.year + "<br>"
+        + "Unemployment Rate: " + d.unemployment + "%" + "<br>"
+        + "Average Internet Users: " + d.internet_users; 
+        }
+      });
+
+};
 
 });
 
