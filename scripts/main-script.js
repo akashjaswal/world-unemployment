@@ -2,12 +2,11 @@
 
 dataset = d3.csv("data/Economy_Parameters_clean.csv", function(dataset){
 
-makePlot(dataset);
+  var year = [];
+  var country = [];
+  var region = [];
+  var income_group = [];
 
-  var year = []
-  var country = []
-  var region = []
-  var income_group = []
   dataset.forEach(function(d)
   {
     year.push(d.year);
@@ -21,6 +20,14 @@ makePlot(dataset);
   region = _.uniq(region);
   income_group = _.uniq(income_group);
 
+  makePlot(dataset);
+  var filtered_data = dataset;
+
+  var region_list = region;
+  var countries = country;
+  var income_group_list = income_group;
+  var years = year;
+
     var cl = document.getElementById("country-list");
     country.forEach(function(d){
       var option = document.createElement("option");
@@ -28,29 +35,23 @@ makePlot(dataset);
       cl.add(option);
     });
     $(".filter-country").chosen({width: "25%", placeholder_text_multiple: "Country"});
-    var filtered_data = []
     $( ".filter-country" ).change(function() {
-      var countries = $('#country-list').val();
-      var filtered_data = [];
+      countries = $('#country-list').val();
+      console.log(countries, region_list, income_group_list, years);
       if(countries == null)
       {
-        var filtered_data = [];
-        d3.selectAll("svg").remove();
-        makePlot(dataset);
+        countries = country;
+        filtered_data = filterData(dataset, countries, region_list, income_group_list, years);
+        makePlot(filtered_data);
+        console.log(countries, region_list, income_group_list, years);
       }
       else
       {
-      for(var i=0; i < countries.length; i++)
-      {
-        console.log(countries[i]);
-        filtered_data = filtered_data.concat(_.filter(dataset,function(d){return d.country == countries[i];}));
-      }
-      console.log(filtered_data);
-      d3.selectAll("svg").remove();
+      filtered_data = filterData(dataset, countries, region_list, income_group_list, years); 
       makePlot(filtered_data);
+      console.log(countries, region_list, income_group_list, years);
     };
     });
-
     var rl = document.getElementById("region-list");
     region.forEach(function(d){
       var option = document.createElement("option");
@@ -59,60 +60,46 @@ makePlot(dataset);
     });
     
     $(".filter-region").chosen({width: "25%", placeholder_text_multiple: "Regions"});
+
     $( ".filter-region" ).change(function() {
-      var region_list = $('#region-list').val();
-      console.log(region_list);
-      var filtered_data = [];
+      region_list = $('#region-list').val();
       if(region_list == null)
       {
-        var filtered_data = [];
-        d3.selectAll("svg").remove();
-        makePlot(dataset);
+        region_list = region;
+        filtered_data = filterData(dataset, countries, region_list, income_group_list, years); 
+        makePlot(filtered_data);
       }
       else {
-        for(var i=0; i < region_list.length; i++)
-          {
-            console.log(region_list[i]);
-            filtered_data = filtered_data.concat(_.filter(dataset,function(d){return d.region == region_list[i];}));
-          }
-        console.log(filtered_data);
-        d3.selectAll("svg").remove();
+        filtered_data = filterData(dataset, countries, region_list, income_group_list, years); 
         makePlot(filtered_data);
       };
     });
 
-  var ig = document.getElementById("ig-list");
+    var ig = document.getElementById("ig-list");
+
     income_group.forEach(function(d){
       var option = document.createElement("option");
       option.text = d;
       ig.add(option);
     });
+
     $(".filter-ig").chosen({width: "25%", placeholder_text_multiple: "Income Group"});
     
     $( ".filter-ig" ).change(function() {
-      var income_group_list = $('#ig-list').val();
-      console.log(income_group_list);
-      var filtered_data = [];
+      income_group_list = $('#ig-list').val();
       if(income_group_list == null)
       {
-        var filtered_data = [];
-        d3.selectAll("svg").remove();
-        makePlot(dataset);
+        income_group_list = income_group;
+        filtered_data = filterData(dataset, countries, region_list, income_group_list, years); 
+        makePlot(filtered_data);
       }
       else
       {
-      for(var i=0; i < income_group_list.length; i++)
-      {
-        console.log(income_group_list[i]);
-        filtered_data = filtered_data.concat(_.filter(dataset,function(d){return d.income_group == income_group_list[i];}));
-      }
-      console.log(filtered_data);
-      d3.selectAll("svg").remove();
+      filtered_data = filterData(dataset, countries, region_list, income_group_list, years); 
       makePlot(filtered_data);
+      console.log(filtered_data);
     };
-
     });
-
 
   var tooltip = $('<div id="tooltip" />').css({
     position: 'absolute',
@@ -148,35 +135,21 @@ makePlot(dataset);
       change: function(event, ui) {
         start = ui.values[0];
         stop = ui.values[1];
-        var years = [];
+        years = [];
         while(start <= stop){
-          years.push(start);
+          years.push(start.toString());
           start++;
         }
-        console.log(years);
-        var filtered_data = [];
-        if(years == null)
-        {
-          var filtered_data = [];
-          d3.selectAll("svg").remove();
-          makePlot(dataset);
-        }
-        else {
-          for(var i=0; i < years.length; i++)
-            {
-              filtered_data = filtered_data.concat(_.filter(dataset,function(d){return d.year == years[i];}));
-            }
-          console.log(filtered_data);
-          d3.selectAll("svg").remove();
+          filtered_data = filterData(dataset, countries, region_list, income_group_list, years);
           makePlot(filtered_data);
-      };
       }
   });
 
 pop = [];
-dataset.forEach(function(d){ pop.push(parseInt(d.population)); });
+dataset.forEach(function(d){pop.push(parseInt(d.population)); });
 var min_pop = _.min(pop);
 var max_pop = _.max(pop);
+
 $("#slider2" ).slider({
     min: min_pop,
     max: max_pop,
@@ -207,10 +180,25 @@ $("#slider2" ).slider({
         stop = ui.values[1];
         var filtered_data = []
         filtered_data = filtered_data.concat(_.filter(dataset, function(d){return (d.population > start && d.population < stop); }));
-        d3.selectAll("svg").remove();
         makePlot(filtered_data);
       }
     });
+
+//----------------------------------------------------------
+
+
+function filterData(dataset,countries, region_list, income_group_list, years)
+{
+  var filtered_data = [];
+  filtered_data = filtered_data.concat(_.filter(dataset,function(d){
+        if ($.inArray(d.country, countries) != -1 && $.inArray(d.region, region_list) != -1 
+          && $.inArray(d.income_group, income_group_list) != 1 && $.inArray(d.year, years) != -1) {
+          return true;
+        };
+      }));
+  return filtered_data;
+}
+
 //----------------------------------------------------------
 
 // Data Plotting 
@@ -218,6 +206,8 @@ $("#slider2" ).slider({
 function makePlot(dataset)
 
 {
+
+  d3.selectAll("svg").remove();
 
   var margin = {top: 20, right: 20, bottom: 30, left: 50};
   var w = 800 - margin.left - margin.right;
@@ -301,6 +291,9 @@ $('svg circle').tipsy({
       });
 
 };
+
+x = function(d){ $.inArray(d.country, ["Argentina"]);
+console.log("yes,",x)};
 
 });
 
