@@ -176,7 +176,7 @@ $("#slider2" ).slider({
         start = ui.values[0];
         stop = ui.values[1];
         var filtered_data = []
-        filtered_data = filtered_data.concat(_.filter(dataset, function(d){return (d.population > start && d.population < stop); }));
+        filtered_data = filtered_data.concat(_.filter(dataset, function(d){return (d.population >= start && d.population <= stop); }));
         makePlot(filtered_data);
       }
     });
@@ -278,11 +278,13 @@ $('svg circle').tipsy({
         html: true, 
         title: function() {
           var d = this.__data__;
-        return "Country: " + d.country + "<br>" 
-        + "Year: " + d.year + "<br>"
-        + "Unemployment Rate: " + d.unemployment + "%" + "<br>"
-        + "Average Internet Users: " + d.internet_users + "<br>"
-        + "Total Population: " + d.population; 
+        return "Country: " + "<i>" + d.country + "</i>" + "<br>" 
+        + "Year: " + "<i>" + d.year + "</i>" + "<br>"
+        + "Unemployment Rate: " + "<i>" + d.unemployment + "%" + "</i>" + "<br>"
+        + "Average Internet Users: " + "<i>" + d.internet_users + "</i>" + "<br>"
+        + "Total Population: " + "<i>" + d.population + "</i>" + "<br>"
+        + "Region: " + "<i>" + d.region + "</i>" + "<br>"
+        + "Income Group: " + "<i>" + d.income_group + "</i>"; 
         }
       });
 
