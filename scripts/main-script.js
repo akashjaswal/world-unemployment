@@ -21,13 +21,12 @@ dataset = d3.csv("data/Economy_Parameters_clean.csv", function(dataset){
   income_group = _.uniq(income_group);
 
   makePlot(dataset);
-  var filtered_data = dataset;
 
   var region_list = region;
   var countries = country;
   var income_group_list = income_group;
   var years = year;
-
+  console.log(income_group_list);
     var cl = document.getElementById("country-list");
     country.forEach(function(d){
       var option = document.createElement("option");
@@ -37,7 +36,6 @@ dataset = d3.csv("data/Economy_Parameters_clean.csv", function(dataset){
     $(".filter-country").chosen({width: "25%", placeholder_text_multiple: "Country"});
     $( ".filter-country" ).change(function() {
       countries = $('#country-list').val();
-      console.log(countries, region_list, income_group_list, years);
       if(countries == null)
       {
         countries = country;
@@ -84,7 +82,6 @@ dataset = d3.csv("data/Economy_Parameters_clean.csv", function(dataset){
     });
 
     $(".filter-ig").chosen({width: "25%", placeholder_text_multiple: "Income Group"});
-    
     $( ".filter-ig" ).change(function() {
       income_group_list = $('#ig-list').val();
       if(income_group_list == null)
@@ -95,9 +92,9 @@ dataset = d3.csv("data/Economy_Parameters_clean.csv", function(dataset){
       }
       else
       {
-      filtered_data = filterData(dataset, countries, region_list, income_group_list, years); 
-      makePlot(filtered_data);
-      console.log(filtered_data);
+        filtered_data = filterData(dataset, countries, region_list, income_group_list, years); 
+        console.log(filtered_data);
+        makePlot(filtered_data);
     };
     });
 
@@ -190,12 +187,11 @@ $("#slider2" ).slider({
 function filterData(dataset,countries, region_list, income_group_list, years)
 {
   var filtered_data = [];
-  filtered_data = filtered_data.concat(_.filter(dataset,function(d){
-        if ($.inArray(d.country, countries) != -1 && $.inArray(d.region, region_list) != -1 
-          && $.inArray(d.income_group, income_group_list) != 1 && $.inArray(d.year, years) != -1) {
+  filtered_data = _.filter(dataset,function(d){
+        if (($.inArray(d.country, countries) != -1) && ($.inArray(d.region, region_list) != -1) && ($.inArray(d.income_group, income_group_list) != -1) && ($.inArray(d.year, years) != -1)) {
           return true;
         };
-      }));
+      });
   return filtered_data;
 }
 
