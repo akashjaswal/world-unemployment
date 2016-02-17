@@ -3,13 +3,25 @@ body {
   color: #7f8c8d;
 }
 
+.axis path,
+.axis line {
+    fill: none;
+    stroke: black;
+    shape-rendering: crispEdges;
+}
 .axis text {
-  font: 11px sans-serif;
+    font: 11px sans-serif;
+}
+.row {
+    width: 100%;
+    text-align: center;
 }
 
-.axis path {
-  display: none;
+.block {
+    width: 100px;
+    display: inline-block;
 }
+
 
 #slider { 
 	margin: 10px;
@@ -26,11 +38,7 @@ body {
     float:left;
 }
 
-.axis line {
-  fill: none;
-  stroke: #000;
-  shape-rendering: crispEdges;
-}
+
 
 .grid-background {
   fill: #ddd;
